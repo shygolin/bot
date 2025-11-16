@@ -3,7 +3,7 @@ import csv
 import discord
 from discord.ext import commands
 from discord.ext import tasks
-import datetime
+from datetime import datetime
 
 CHANNEL_ID = os.getenv("channel_id") #從 nas 讀取 id
 TOKEN = os.getenv("DISCORD_TOKEN")  # 從 nas 讀取 Token
@@ -156,6 +156,7 @@ async def howto(ctx):
 """
     await ctx.send(help_text)
 bot.run(TOKEN)
+
 
 
 
