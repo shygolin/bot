@@ -45,6 +45,9 @@ async def daily_balance():
             f"📈 總收入：{total_income}\n"
             f"📉 總支出：{total_expense}"
         )
+    else:
+        print("Not time yet.") 
+    
 
 @daily_balance.before_loop
 async def before_daily_balance():
@@ -153,5 +156,6 @@ async def howto(ctx):
 """
     await ctx.send(help_text)
 bot.run(TOKEN)
+
 
 
