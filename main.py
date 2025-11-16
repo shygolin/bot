@@ -56,7 +56,8 @@ async def before_daily_balance():
 @bot.event
 # 當機器人完成啟動
 async def on_ready():
-    print(f"目前登入身份 --> {bot.user}")
+    print(f"目前登入身份 --> {bot.user}"）
+    print（datetime.now)
     daily_balance.start()
 
 @bot.command()
@@ -156,6 +157,7 @@ async def howto(ctx):
 """
     await ctx.send(help_text)
 bot.run(TOKEN)
+
 
 
 
