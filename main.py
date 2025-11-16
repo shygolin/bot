@@ -13,6 +13,9 @@ bot = commands.Bot(command_prefix="%", intents=intents)
 @bot.event
 async def on_ready():
     print(f"目前登入身份 --> {bot.user}")
+    # start the daily task after the event loop is running
+    if not daily_balance.is_running():
+        daily_balance.start()
 
 @tasks.loop(minutes=1)
 async def daily_balance():
@@ -22,7 +25,11 @@ async def daily_balance():
             return
         channel = bot.get_channel(CHANNEL_ID)
         if channel is None:
-            return
+            # cache 裡沒有時，嘗試 fetch 作為後備
+            try:
+                channel = await bot.fetch_channel(CHANNEL_ID)
+            except Exception:
+                return
 
         # 計算餘額
         if not os.path.isfile('accounting.csv'):
@@ -55,7 +62,8 @@ async def before_daily_balance():
 
 @bot.command()
 async def input(ctx, amount: float, *, description: str = "無備註"):
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     data = [timestamp, "收入", amount, description, ctx.author.name]
 
     file_exists = os.path.isfile('accounting.csv')
@@ -71,7 +79,8 @@ async def input(ctx, amount: float, *, description: str = "無備註"):
 
 @bot.command()
 async def output(ctx, amount: float, *, description: str = "無備註"):
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    # timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     data = [timestamp, "支出", amount, description, ctx.author.name]
 
     file_exists = os.path.isfile('accounting.csv')
@@ -126,6 +135,4 @@ async def howto(ctx):
         "%clear\n"
         "%howto"
     )
-
-daily_balance.start()
 bot.run(TOKEN)
