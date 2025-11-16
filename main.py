@@ -12,19 +12,10 @@ intents = discord.Intents.all()
 # command_prefix是前綴符號，可以自由選擇($, #, &...)
 bot = commands.Bot(command_prefix = "%", intents = intents)
 
-@bot.event
-# 當機器人完成啟動
-async def on_ready():
-    print(f"目前登入身份 --> {bot.user}")
-
-@bot.command()
-async def synccommands(ctx):
-    await bot.tree.sync()
-    await ctx.send("已同步指令")
-
 @tasks.loop(minutes=1)
 async def daily_balance():
-    now = datetime.datetime.now().strftime("%H:%M")
+    """每分鐘檢查一次，在 00:00 觸發每日結算"""
+    now = datetime.now().strftime("%H:%M")
     if now == "00:00":  # 每天 00:00 觸發
         channel = bot.get_channel(CHANNEL_ID)
         if channel is None:
@@ -59,8 +50,16 @@ async def daily_balance():
 async def before_daily_balance():
     await bot.wait_until_ready()
 
-# 啟動排程
-daily_balance.start()
+@bot.event
+# 當機器人完成啟動
+async def on_ready():
+    print(f"目前登入身份 --> {bot.user}")
+    daily_balance.start()
+
+@bot.command()
+async def synccommands(ctx):
+    await bot.tree.sync()
+    await ctx.send("已同步指令")
 
 # 建立一個紀錄收入的指令
 @bot.hybrid_command()
@@ -154,4 +153,5 @@ async def howto(ctx):
 """
     await ctx.send(help_text)
 bot.run(TOKEN)
+
 
